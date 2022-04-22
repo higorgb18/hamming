@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="./style.css">
+        <title>Hamming</title>
+    </head>
+
+    <body>
+
+        <h1>Gerador e verificador de código de Hamming</h1>
+
+        <label for="selectOption">Selecione o que deseja fazer</label>
+
+        <select id="selectOption">
+            <option value="0" selected disabled>Selecione</option>
+            <option value="1">Enviar um grupo de bits</option>
+            <option value="2">Verificar um grupo de bits recebido</option>
+        </select>
+
+        <div id="inputContainer" style="display: none">
+            <input type="number" min="0" id="bitsInput"  />
+            <button onclick = getBits() id="btnInput" class="inputDiv">Inserir</button>
+        </div>
+
+        <div id="infosContainer">
+            <button onclick=test()>clicaaa</button>
+        </div>
+
+        <script src="./script.js"></script>
+
+    </body>
+
+</html>

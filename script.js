@@ -28,7 +28,7 @@ function getBits() {
 
     for(let count = 0; count < enteredValue; count++) {
 
-        let binaryNumber = window.prompt(`Digite o número ${count + 1}`);
+        let binaryNumber = window.prompt(`Digite o bit de número ${count + 1}`);
         binaryValues.push(binaryNumber);
 
     }
@@ -55,10 +55,19 @@ function test() {
 
 function sendBits() {
 
+    let redundancyBits = 1;
+    let redundancyBitsArray = [];
+
     const paragraphTag = document.createElement("p");
 
     paragraphTag.innerHTML = `Dados originais: ${binaryValues.join('')}`;
     document.getElementById("infosContainer").appendChild(paragraphTag);
+
+    while(binaryValues.length > 2**redundancyBits - redundancyBits - 1) {
+        redundancyBits++;
+    }
+
+    console.log(binaryValues.length + nroBitsRdn);
 
 }
 

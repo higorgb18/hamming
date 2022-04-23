@@ -29,7 +29,7 @@ function getBits() {
     for(let count = 0; count < enteredValue; count++) {
 
         let binaryNumber = window.prompt(`Digite o bit de número ${count + 1}`);
-        binaryValues.push(binaryNumber);
+        binaryValues.push(Number(binaryNumber));
 
     }
 
@@ -47,16 +47,12 @@ function getBits() {
 
 }
 
-function test() {
-
-    console.log(binaryValues);
-    
-}
-
 function sendBits() {
 
     let redundancyBits = 1;
     let redundancyBitsArray = [];
+    let hammingCode = [];
+    let originalBitIndex = 0;
 
     const paragraphTag = document.createElement("p");
 
@@ -67,7 +63,42 @@ function sendBits() {
         redundancyBits++;
     }
 
-    console.log(binaryValues.length + nroBitsRdn);
+    let totalBits = binaryValues.length + redundancyBits;
+
+    for(let count = 0; count < redundancyBits; count++) {
+
+        let indexOfRedundancyBit = 2**count;
+        redundancyBitsArray.push(indexOfRedundancyBit);
+
+    }
+
+    for(let count = 0; count < totalBits; count++) {
+
+        if(redundancyBitsArray.includes(count + 1)) {
+
+            hammingCode[count] = '?';
+
+        } else {
+
+            hammingCode[count] = binaryValues[originalBitIndex];
+            originalBitIndex ++;
+
+        }
+
+    }
+
+    hammingCode.forEach((element, index) => {
+        
+        if(element === '?') {
+
+            let slicedHamming = hammingCode.slice(index + 1, hammingCode.length);
+            let parity = 0;
+
+            console.log(slicedHamming);
+
+        }
+
+    })
 
 }
 

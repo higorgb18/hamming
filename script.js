@@ -7,42 +7,23 @@ select.addEventListener("change", function handleSelectedOption(event) {
     option = event.target.value;
     document.getElementById("inputContainer").style.display = "flex";
 
-    switch(option) {
-
-        case "1":
-            document.getElementById("bitsInput").placeholder = "Digite a quantidade de bits do grupo original";
-        break;
-        
-        case "2":
-            document.getElementById("bitsInput").placeholder = "Digite a quantidade de bits que foram recebidos";
-        break;
-    
-    }
-
 })
 
 function getBits() {
 
     const enteredValue = document.getElementById("bitsInput").value;
-    binaryValues = [];
+    binaryValues = enteredValue.split("");
 
-    for(let count = 0; count < enteredValue; count++) {
-
-        let binaryNumber = window.prompt(`Digite o bit de número ${count + 1}`);
-        binaryValues.push(Number(binaryNumber));
-
-    }
-
-    switch(option) {
+    switch (option) {
 
         case "1":
             sendBits();
-        break;
-        
+            break;
+
         case "2":
             verifyBits();
-        break;
-    
+            break;
+
     }
 
 }
@@ -54,53 +35,81 @@ function sendBits() {
     let hammingCode = [];
     let originalBitIndex = 0;
 
-    const paragraphTag = document.createElement("p");
+    const paragraphInsertedData = document.createElement("p");
+    const paragraphSendedData = document.createElement("p");
 
-    paragraphTag.innerHTML = `Dados originais: ${binaryValues.join('')}`;
-    document.getElementById("infosContainer").appendChild(paragraphTag);
+    paragraphInsertedData.innerHTML = `Dados originais: ${binaryValues.join('')}`;
+    document.getElementById("infosContainer").appendChild(paragraphInsertedData);
 
-    while(binaryValues.length > 2**redundancyBits - redundancyBits - 1) {
+    while (binaryValues.length > 2 ** redundancyBits - redundancyBits - 1) {
         redundancyBits++;
     }
 
     let totalBits = binaryValues.length + redundancyBits;
 
-    for(let count = 0; count < redundancyBits; count++) {
+    for (let count = 0; count < redundancyBits; count++) {
 
-        let indexOfRedundancyBit = 2**count;
+        let indexOfRedundancyBit = 2 ** count;
         redundancyBitsArray.push(indexOfRedundancyBit);
 
     }
 
-    for(let count = 0; count < totalBits; count++) {
+    for (let count = 0; count < totalBits; count++) {
 
-        if(redundancyBitsArray.includes(count + 1)) {
+        if (redundancyBitsArray.includes(count + 1)) {
 
             hammingCode[count] = '?';
 
         } else {
 
             hammingCode[count] = binaryValues[originalBitIndex];
-            originalBitIndex ++;
+            originalBitIndex++;
 
         }
 
     }
 
-    hammingCode.forEach((element, index) => {
-        
-        if(element === '?') {
+    for (let countRedundancy = 0; countRedundancy < redundancyBits; countRedundancy++) {
 
-            let slicedHamming = hammingCode.slice(index + 1, hammingCode.length);
-            let parity = 0;
+        let position = Math.pow(2, countRedundancy);
+        let parity = 0;
+        let s = position - 1;
 
-            console.log(slicedHamming);
+        while (s < totalBits) {
+
+            for (let j = s; j < s + position; j++) {
+
+                if (hammingCode[j] == '1') {
+                    parity++;
+                }
+
+            }
+            
+            s = s + 2 * position;
 
         }
 
-    })
+        if (parity % 2 == 0) {
+
+            hammingCode[position - 1] = '0';
+
+        } else {
+
+            hammingCode[position - 1] = '1';
+
+        }
+    }
+
+    let infosContainer = document.getElementById("infosContainer")
+
+    paragraphSendedData.innerHTML = `Dados que serão inseridos: ${hammingCode.join('')}`;
+    infosContainer.appendChild(paragraphSendedData);
+    infosContainer.style.display = "flex";
+
 
 }
+
+
 
 function verifyBits() {
 

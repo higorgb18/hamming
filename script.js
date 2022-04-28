@@ -1,4 +1,9 @@
 const select = document.getElementById("selectOption");
+const input = document.getElementById("bitsInput");
+const infosContainer = document.getElementById("infosContainer")
+const paragraphInsertedData = document.createElement("p");
+const paragraphSendedData = document.createElement("p");
+
 var binaryValues = [];
 var option;
 
@@ -7,42 +12,57 @@ select.addEventListener("change", function handleSelectedOption(event) {
     option = event.target.value;
     document.getElementById("inputContainer").style.display = "flex";
 
-})
+});
+
+input.addEventListener("keypress", function (event) {
+
+    if (event.key === "Enter") {
+
+        document.getElementById("btnInput").click();
+
+    }
+
+});
 
 function getBits() {
 
     const enteredValue = document.getElementById("bitsInput").value;
-    binaryValues = enteredValue.split("");
 
-    switch (option) {
+    if (!enteredValue.match(/[^10]/)) {
 
-        case "1":
-            sendBits();
-            break;
+        switch (option) {
 
-        case "2":
-            verifyBits();
-            break;
+            case "1":
+                sendBits(enteredValue);
+                break;
+
+            case "2":
+                verifyBits(enteredValue);
+                break;
+
+        }
+
+    } else {
+
+        window.alert("A entrada deve ser apenas com números binários (0 ou 1)")
 
     }
 
 }
 
-function sendBits() {
+function sendBits(insertedBits) {
 
     let redundancyBits = 1;
     let redundancyBitsArray = [];
     let hammingCode = [];
     let originalBitIndex = 0;
 
-    const paragraphInsertedData = document.createElement("p");
-    const paragraphSendedData = document.createElement("p");
-
-    paragraphInsertedData.innerHTML = `Dados originais: ${binaryValues.join('')}`;
-    document.getElementById("infosContainer").appendChild(paragraphInsertedData);
+    binaryValues = insertedBits.split("");
 
     while (binaryValues.length > 2 ** redundancyBits - redundancyBits - 1) {
+
         redundancyBits++;
+
     }
 
     let totalBits = binaryValues.length + redundancyBits;
@@ -84,7 +104,7 @@ function sendBits() {
                 }
 
             }
-            
+
             s = s + 2 * position;
 
         }
@@ -100,20 +120,102 @@ function sendBits() {
         }
     }
 
-    let infosContainer = document.getElementById("infosContainer")
+    if (option == '1') {
 
-    paragraphSendedData.innerHTML = `Dados que serão inseridos: ${hammingCode.join('')}`;
-    infosContainer.appendChild(paragraphSendedData);
-    infosContainer.style.display = "flex";
+        paragraphInsertedData.innerHTML = `Dados originais: ${input.value}`;
+        document.getElementById("infosContainer").appendChild(paragraphInsertedData);
 
+        paragraphSendedData.innerHTML = `Dados que serão inseridos: ${hammingCode.join('')}`;
+        infosContainer.appendChild(paragraphSendedData);
+        infosContainer.style.display = "flex";
+
+    }
+
+    return hammingCode;
 
 }
 
+function verifyBits(insertedBits) {
 
+    binaryValues = insertedBits.split("");
 
-function verifyBits() {
+    let parity = 0;
+    let code = []
+    let controlBitsIndexes = [];
+    let i = 1;
 
-    console.log(binaryValues);
+    for (let mask = 4; mask >= 1; mask--) {
+
+        for (let bit = 1; bit <= binaryValues.length; bit++) {
+
+            if (bit & mask) {
+
+                if (binaryValues[binaryValues.length - bit] == '1') {
+
+                    parity ^= mask;
+                    
+                }
+
+            }
+
+        }
+
+    }
+
+    let indexOfErrorBit = binaryValues.length - parity;
+
+    while (binaryValues.length / i >= 1) {
+
+        controlBitsIndexes.push(i);
+        i *= 2;
+
+    }
+
+    binaryValues.forEach((element, index) => {
+
+        if(index == indexOfErrorBit) {
+
+            if(element == '1') {
+
+                binaryValues[index - 1] = '0'
+
+            } else if (element == '0') {
+
+                binaryValues[index - 1] = '1'
+
+            }
+
+        }
+
+    })
+
+    for(let index = 0; index < 11; index++) {
+
+        if(!controlBitsIndexes.includes(index + 1)) {
+
+           code.push(binaryValues[index]);
+
+        }
+
+    }
+
+    if (option == '2' && indexOfErrorBit != binaryValues.length) {
+
+        paragraphInsertedData.innerHTML = `Foi detectado um erro no bit de número ${indexOfErrorBit} do grupo: ${insertedBits}`;
+        document.getElementById("infosContainer").appendChild(paragraphInsertedData);
+
+        paragraphSendedData.innerHTML = `Grupo de bits finais com o bit corrigido: ${code.join('')}`;
+        infosContainer.appendChild(paragraphSendedData);
+        infosContainer.style.display = "flex";
+
+    } else {
+
+        paragraphInsertedData.innerHTML = `Não foi detectado nenhum erro no grupo: ${insertedBits}`;
+        document.getElementById("infosContainer").appendChild(paragraphInsertedData);
+
+        infosContainer.style.display = "flex";
+
+    }
 
 }
 

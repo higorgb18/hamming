@@ -144,7 +144,14 @@ function verifyBits(insertedBits) {
     let controlBitsIndexes = [];
     let i = 1;
 
-    for (let mask = 4; mask >= 1; mask--) {
+    while (binaryValues.length / i >= 1) {
+
+        controlBitsIndexes.push(i);
+        i *= 2;
+
+    }
+
+    for (let mask = controlBitsIndexes.length; mask >= 1; mask--) {
 
         for (let bit = 1; bit <= binaryValues.length; bit++) {
 
@@ -164,18 +171,11 @@ function verifyBits(insertedBits) {
 
     let indexOfErrorBit = binaryValues.length - parity;
 
-    while (binaryValues.length / i >= 1) {
-
-        controlBitsIndexes.push(i);
-        i *= 2;
-
-    }
-
     binaryValues.forEach((element, index) => {
 
-        if(index == indexOfErrorBit) {
+        if (index == indexOfErrorBit) {
 
-            if(element == '1') {
+            if (element == '1') {
 
                 binaryValues[index - 1] = '0'
 
@@ -189,9 +189,9 @@ function verifyBits(insertedBits) {
 
     })
 
-    for(let index = 0; index < 11; index++) {
+    for (let index = 0; index < 11; index++) {
 
-        if(!controlBitsIndexes.includes(index + 1)) {
+        if (!controlBitsIndexes.includes(index + 1)) {
 
            code.push(binaryValues[index]);
 

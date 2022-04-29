@@ -53,8 +53,7 @@ function getBits() {
 function sendBits(insertedBits) {
 
     let redundancyBits = 1;
-    let redundancyBitsArray = [];
-    let hammingCode = [];
+    let redundancyBitsArray = [], hammingCode = [];
     let originalBitIndex = 0;
 
     binaryValues = insertedBits.split("");
@@ -137,12 +136,10 @@ function sendBits(insertedBits) {
 
 function verifyBits(insertedBits) {
 
-    binaryValues = insertedBits.split("");
-
-    let parity = 0;
-    let code = []
-    let controlBitsIndexes = [];
     let i = 1;
+    let code = [], controlBitsIndexes = [], redundancyBitsArray = [], reverseIndexPosition = [];
+
+    binaryValues = insertedBits.split("").reverse()
 
     while (binaryValues.length / i >= 1) {
 
@@ -151,17 +148,45 @@ function verifyBits(insertedBits) {
 
     }
 
-    for (let mask = controlBitsIndexes.length; mask >= 1; mask--) {
+    for(n = 0; n <= controlBitsIndexes.length - 1; n++) {
 
-        for (let bit = 1; bit <= binaryValues.length; bit++) {
+        let position = binaryValues.length - 2**n;
+        reverseIndexPosition.push(binaryValues.length - 2**n);
 
-            if (bit & mask) {
+        if(reverseIndexPosition.includes(position)) {
 
-                if (binaryValues[binaryValues.length - bit] == '1') {
+            count = 0;
+            parity = 0;
 
-                    parity ^= mask;
-                    
+            while(position >= 0) {
+
+                if(count < 2**n) {
+
+                    if(binaryValues[position] == '1') {
+                        parity++;
+                    }
+
+                    position--;
+                    count++;
+
+                } else {
+
+                    while(count != 0) {
+                        position--;
+                        count--;
+                    }
+                   
                 }
+
+            }
+
+            if(parity%2 == 0) {
+
+                redundancyBitsArray.push('0')
+
+            } else {
+
+                redundancyBitsArray.push('1')
 
             }
 
@@ -169,17 +194,18 @@ function verifyBits(insertedBits) {
 
     }
 
-    let indexOfErrorBit = binaryValues.length - parity;
+    redundancyBitsArray = redundancyBitsArray.reverse()
+    indexOfErrorBit = parseInt(redundancyBitsArray.join(""), 2);
 
-    binaryValues.forEach((element, index) => {
+    binaryValues.reverse().forEach((element, index) => {
 
-        if (index == indexOfErrorBit) {
+        if(index == indexOfErrorBit) {
 
-            if (element == '1') {
+            if(element == '1') {
 
                 binaryValues[index - 1] = '0'
 
-            } else if (element == '0') {
+            } else if(element == '0') {
 
                 binaryValues[index - 1] = '1'
 
@@ -189,7 +215,7 @@ function verifyBits(insertedBits) {
 
     })
 
-    for (let index = 0; index < 11; index++) {
+    for(let index = 0; index < binaryValues.length; index++) {
 
         if (!controlBitsIndexes.includes(index + 1)) {
 
@@ -199,7 +225,7 @@ function verifyBits(insertedBits) {
 
     }
 
-    if (option == '2' && indexOfErrorBit != binaryValues.length) {
+    if (option == '2' && indexOfErrorBit != 0) {
 
         paragraphInsertedData.innerHTML = `Foi detectado um erro no bit de número ${indexOfErrorBit} do grupo: ${insertedBits}`;
         document.getElementById("infosContainer").appendChild(paragraphInsertedData);

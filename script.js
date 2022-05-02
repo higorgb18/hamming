@@ -4,17 +4,18 @@ const infosContainer = document.getElementById("infosContainer")
 const paragraphInsertedData = document.createElement("p");
 const paragraphSendedData = document.createElement("p");
 
-var binaryValues = [];
-var option;
+var binaryValues = []; //array para armazenar os valores inseridos
+var option; //armazena a opção escolhida
 
-select.addEventListener("change", function handleSelectedOption(event) {
+select.addEventListener("change", function handleSelectedOption(event) { //mostra o campo de texto ao selecionar a opção desejada
 
     option = event.target.value;
     document.getElementById("inputContainer").style.display = "flex";
+    infosContainer.style.display = "none";
 
 });
 
-input.addEventListener("keypress", function (event) {
+input.addEventListener("keypress", function (event) { //ativa o botão também ao usar a tecla enter
 
     if (event.key === "Enter") {
 
@@ -24,11 +25,11 @@ input.addEventListener("keypress", function (event) {
 
 });
 
-function getBits() {
+function getBits() { //função para armazenar os bits separados em um array
 
-    const enteredValue = document.getElementById("bitsInput").value;
+    const enteredValue = document.getElementById("bitsInput").value; //pega o valor inserido no campo de texto
 
-    if (!enteredValue.match(/[^10]/)) {
+    if (!enteredValue.match(/[^10]/)) { //expressão regular para negar qualquer valor diferente de 0 ou 1
 
         switch (option) {
 
@@ -50,30 +51,30 @@ function getBits() {
 
 }
 
-function sendBits(insertedBits) {
+function sendBits(insertedBits) { //função para gerar os bits
 
     let redundancyBits = 1;
     let redundancyBitsArray = [], hammingCode = [];
     let originalBitIndex = 0;
 
-    binaryValues = insertedBits.split("");
+    binaryValues = insertedBits.split(""); //separa os bits da string e armazena no array
 
-    while (binaryValues.length > 2 ** redundancyBits - redundancyBits - 1) {
+    while (binaryValues.length > 2 ** redundancyBits - redundancyBits - 1) { //pega a quantidade de bits redundantes
 
         redundancyBits++;
 
     }
 
-    let totalBits = binaryValues.length + redundancyBits;
+    let totalBits = binaryValues.length + redundancyBits; //soma dos bits totais
 
-    for (let count = 0; count < redundancyBits; count++) {
+    for (let count = 0; count < redundancyBits; count++) { //array com a posição dos bits de redundância
 
         let indexOfRedundancyBit = 2 ** count;
         redundancyBitsArray.push(indexOfRedundancyBit);
 
     }
 
-    for (let count = 0; count < totalBits; count++) {
+    for (let count = 0; count < totalBits; count++) { //adiciona '?' no lugar dos bits de redundância e preenche com os outros valores dos bits iniciais
 
         if (redundancyBitsArray.includes(count + 1)) {
 
@@ -88,7 +89,7 @@ function sendBits(insertedBits) {
 
     }
 
-    for (let countRedundancy = 0; countRedundancy < redundancyBits; countRedundancy++) {
+    for (let countRedundancy = 0; countRedundancy < redundancyBits; countRedundancy++) { //loop para o calculo de paridade a partir de cada bit redundante
 
         let position = Math.pow(2, countRedundancy);
         let parity = 0;
@@ -119,7 +120,7 @@ function sendBits(insertedBits) {
         }
     }
 
-    if (option == '1') {
+    if (option == '1') { //se a opção escolhida for a de gerar o código, cria os elementos abaixo no html
 
         paragraphInsertedData.innerHTML = `Dados originais: ${input.value}`;
         document.getElementById("infosContainer").appendChild(paragraphInsertedData);
@@ -139,16 +140,16 @@ function verifyBits(insertedBits) {
     let i = 1;
     let code = [], controlBitsIndexes = [], redundancyBitsArray = [], reverseIndexPosition = [];
 
-    binaryValues = insertedBits.split("").reverse()
+    binaryValues = insertedBits.split("").reverse() //separa os bits e coloca em um array com a posição invertida
 
-    while (binaryValues.length / i >= 1) {
+    while (binaryValues.length / i >= 1) { //pega a posição dos bits redundantes
 
         controlBitsIndexes.push(i);
         i *= 2;
 
     }
 
-    for(n = 0; n <= controlBitsIndexes.length - 1; n++) {
+    for(n = 0; n <= controlBitsIndexes.length - 1; n++) { //loop para verificação da paridade e correção caso haja erro
 
         let position = binaryValues.length - 2**n;
         reverseIndexPosition.push(binaryValues.length - 2**n);
@@ -194,10 +195,10 @@ function verifyBits(insertedBits) {
 
     }
 
-    redundancyBitsArray = redundancyBitsArray.reverse()
-    indexOfErrorBit = parseInt(redundancyBitsArray.join(""), 2);
+    redundancyBitsArray = redundancyBitsArray.reverse() //revertendo novamente para a sequência correta
+    indexOfErrorBit = parseInt(redundancyBitsArray.join(""), 2); //pega a posição do bit com erro transformando os valores de bits de redundância obtidos de binário para decimal
 
-    binaryValues.reverse().forEach((element, index) => {
+    binaryValues.reverse().forEach((element, index) => { //troca o valor do bit errado
 
         if(index == indexOfErrorBit) {
 
@@ -215,7 +216,7 @@ function verifyBits(insertedBits) {
 
     })
 
-    for(let index = 0; index < binaryValues.length; index++) {
+    for(let index = 0; index < binaryValues.length; index++) { //array final com os bits corretos
 
         if (!controlBitsIndexes.includes(index + 1)) {
 
@@ -225,7 +226,7 @@ function verifyBits(insertedBits) {
 
     }
 
-    if (option == '2' && indexOfErrorBit != 0) {
+    if (option == '2' && indexOfErrorBit != 0) { //cria no html se tiver erro
 
         paragraphInsertedData.innerHTML = `Foi detectado um erro no bit de número ${indexOfErrorBit} do grupo: ${insertedBits}`;
         document.getElementById("infosContainer").appendChild(paragraphInsertedData);
@@ -234,7 +235,7 @@ function verifyBits(insertedBits) {
         infosContainer.appendChild(paragraphSendedData);
         infosContainer.style.display = "flex";
 
-    } else {
+    } else { //cria no html se não tiver erro
 
         paragraphInsertedData.innerHTML = `Não foi detectado nenhum erro no grupo: ${insertedBits}`;
         document.getElementById("infosContainer").appendChild(paragraphInsertedData);
